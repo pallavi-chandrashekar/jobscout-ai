@@ -1,0 +1,15 @@
+fastapi
+uvicorn
+sqlalchemy
+pydantic[email]
+python-dotenv
+psycopg2-binary
+
+# Optional extras if you're using UUIDs or PostgreSQL features
+uuid
+asyncpg
+
+# Testing dependencies
+pytest
+pytest-asyncio
+httpx
