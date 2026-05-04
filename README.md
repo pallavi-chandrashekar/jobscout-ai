@@ -58,7 +58,21 @@ jobscout-ai/
 └── README.md
 ```
 
-## Getting Started
+## Quick Start (Docker)
+
+```bash
+docker-compose up
+```
+
+That's it. Opens:
+- **Dashboard:** http://localhost:3000
+- **API docs:** http://localhost:8000/docs
+
+**Demo login:** `demo@jobscout.ai` / `demo1234`
+
+Pre-loaded with 10 job postings, 27 community feedbacks, and computed trust scores so you can explore immediately.
+
+## Manual Setup
 
 ### Prerequisites
 - Python 3.10+
@@ -71,6 +85,7 @@ jobscout-ai/
 cd backend
 cp .env.example .env        # Edit with your database URL and API keys
 pip install -r requirements.txt
+PYTHONPATH=. python seed.py  # Load demo data
 PYTHONPATH=. uvicorn app.main:app --reload
 ```
 
