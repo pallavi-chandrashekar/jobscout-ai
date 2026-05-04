@@ -21,19 +21,24 @@ export default function JobDetailPage() {
 
   const fetchData = useCallback(async () => {
     try {
-      const [jobRes, trustRes, feedbackRes] = await Promise.all([
-        api.get<JobPosting>(`/job-postings/${jobId}`),
-        api.get<TrustScoreDetail>(`/trust-score/${jobId}`),
-        api.get<FeedbackAggregation>(`/job-feedbacks/aggregation/${jobId}`),
-      ]);
+      const jobRes = await api.get<JobPosting>(`/job-postings/${jobId}`);
       setJob(jobRes.data);
+    } catch (err) {
+      console.error("Failed to fetch job", err);
+    }
+    try {
+      const trustRes = await api.get<TrustScoreDetail>(`/trust-score/${jobId}`);
       setTrustDetail(trustRes.data);
+    } catch (err) {
+      console.error("Failed to fetch trust score", err);
+    }
+    try {
+      const feedbackRes = await api.get<FeedbackAggregation>(`/job-feedbacks/aggregation/${jobId}`);
       setFeedbackAgg(feedbackRes.data);
     } catch (err) {
-      console.error("Failed to fetch job details", err);
-    } finally {
-      setLoading(false);
+      console.error("Failed to fetch feedback", err);
     }
+    setLoading(false);
   }, [jobId]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
