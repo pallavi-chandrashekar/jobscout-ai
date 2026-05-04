@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Integer, Boolean, DateTime, ForeignKey, Text
+from sqlalchemy import Column, String, Integer, Boolean, DateTime, ForeignKey, Text, Float
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from datetime import datetime
@@ -10,12 +10,11 @@ from app.db.database import Base
 class User(Base):
     __tablename__ = "users"
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
-    email = Column(String, unique=True, nullable=False)
+    email = Column(String, unique=True, nullable=False, index=True)
     name = Column(String)
-    created_at = Column(DateTime, default=datetime.now)
-
-    class Config:
-        orm_mode = True
+    password_hash = Column(String, nullable=False)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
 
     applications = relationship("JobApplication", back_populates="user")
     feedbacks = relationship("JobFeedback", back_populates="user")
@@ -24,14 +23,21 @@ class User(Base):
 class JobPosting(Base):
     __tablename__ = "job_postings"
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
-    url = Column(String, unique=True, nullable=False)
+    url = Column(String, unique=True, nullable=False, index=True)
     title = Column(String)
     company = Column(String)
+    company_url = Column(String, nullable=True)
     location = Column(String)
+    description = Column(Text, nullable=True)
     source = Column(String)
-    trust_score = Column(Integer)
-    posted_date = Column(DateTime)
+    salary_min = Column(Integer, nullable=True)
+    salary_max = Column(Integer, nullable=True)
+    salary_currency = Column(String(3), nullable=True)
+    trust_score = Column(Integer, nullable=True)
+    trust_score_updated_at = Column(DateTime, nullable=True)
+    posted_date = Column(DateTime, nullable=True)
     is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
 
     feedbacks = relationship("JobFeedback", back_populates="job")
     applications = relationship("JobApplication", back_populates="job")
@@ -42,7 +48,7 @@ class JobApplication(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"))
     job_id = Column(UUID(as_uuid=True), ForeignKey("job_postings.id"))
-    status = Column(String)
+    status = Column(String, default="applied")
     applied_date = Column(DateTime, default=datetime.utcnow)
 
     user = relationship("User", back_populates="applications")
@@ -51,12 +57,10 @@ class JobApplication(Base):
 
 class JobFeedback(Base):
     __tablename__ = "job_feedbacks"
-    __table_args__ = {"extend_existing": True}
-
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"))
     job_id = Column(UUID(as_uuid=True), ForeignKey("job_postings.id"))
-    outcome = Column(String)
+    outcome = Column(String, nullable=False)
     feedback_date = Column(DateTime, default=datetime.utcnow)
     comment = Column(Text, nullable=True)
     tag = Column(String(50), nullable=True)
@@ -71,4 +75,7 @@ class OutreachTemplate(Base):
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"))
     job_id = Column(UUID(as_uuid=True), ForeignKey("job_postings.id"))
     message = Column(Text)
+    outreach_type = Column(String, default="cover_letter")
+    tone = Column(String, default="professional")
+    provider = Column(String, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)

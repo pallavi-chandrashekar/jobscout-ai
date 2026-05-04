@@ -2,14 +2,19 @@ fastapi
 uvicorn
 sqlalchemy
 pydantic[email]
+pydantic-settings
 python-dotenv
 psycopg2-binary
+passlib[bcrypt]
+python-jose[cryptography]
+httpx
 
-# Optional extras if you're using UUIDs or PostgreSQL features
-uuid
-asyncpg
+# LLM providers (install the ones you need)
+anthropic
+openai
+google-generativeai
 
-# Testing dependencies
+# Testing
 pytest
 pytest-asyncio
 httpx
