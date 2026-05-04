@@ -1,0 +1,47 @@
+.jobscout-badge {
+  display: inline-block;
+  margin: 8px 0;
+  cursor: pointer;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  z-index: 9999;
+}
+
+.jobscout-badge-inner {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.2s;
+}
+
+.jobscout-badge-inner:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.jobscout-badge-score {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.jobscout-badge-label {
+  font-weight: 500;
+}
+
+.jobscout-badge-confidence {
+  font-size: 11px;
+  opacity: 0.7;
+}
+
+.jobscout-submit-btn {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1d4ed8;
+}
+
+.jobscout-submit-btn:hover {
+  background: #dbeafe;
+}

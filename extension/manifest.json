@@ -1,0 +1,39 @@
+{
+  "manifest_version": 3,
+  "name": "JobScout AI",
+  "version": "1.0.0",
+  "description": "See AI-powered trust scores for job postings on LinkedIn, Indeed, and Glassdoor",
+  "permissions": ["activeTab", "storage"],
+  "host_permissions": [
+    "https://www.linkedin.com/jobs/*",
+    "https://www.indeed.com/*",
+    "https://www.glassdoor.com/job-listing/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.linkedin.com/jobs/*",
+        "https://www.indeed.com/*",
+        "https://www.glassdoor.com/job-listing/*"
+      ],
+      "js": ["content.js"],
+      "css": ["styles/overlay.css"]
+    }
+  ],
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}
