@@ -74,14 +74,27 @@ export default function JobDetailPage() {
           </div>
         )}
         {job.url && (
-          <a
-            href={job.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-4 inline-block text-sm font-medium text-blue-600 hover:text-blue-700"
-          >
-            View Original Posting
-          </a>
+          <div className="mt-4 flex gap-3">
+            <button
+              onClick={async () => {
+                try {
+                  await api.post("/job-applications", { job_id: job.id });
+                } catch {}
+                window.open(job.url, "_blank");
+              }}
+              className="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+            >
+              Apply Now
+            </button>
+            <a
+              href={job.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-lg border border-gray-200 px-5 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+            >
+              View Original
+            </a>
+          </div>
         )}
       </div>
 

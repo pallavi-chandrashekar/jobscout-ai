@@ -8,6 +8,7 @@ psycopg2-binary
 bcrypt
 python-jose[cryptography]
 httpx
+python-jobspy
 
 # LLM providers (install the ones you need)
 anthropic

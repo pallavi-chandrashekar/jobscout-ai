@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useAuth } from "@/lib/auth";
 
 const NAV_ITEMS = [
-  { href: "/dashboard", label: "Job Feed", icon: "🔍" },
+  { href: "/dashboard", label: "Find Jobs", icon: "🔍" },
   { href: "/dashboard/applications", label: "My Applications", icon: "📋" },
   { href: "/dashboard/outreach", label: "Outreach", icon: "✉️" },
 ];
