@@ -6,6 +6,8 @@ JobScout AI helps you cut through fake, expired, or ghosted job postings by scor
 
 ## Features
 
+**Real Job Search** — Search and scrape real job listings from LinkedIn, Indeed, and Glassdoor directly from the dashboard. Filter by keywords, location, and remote. One-click "Apply Now" opens the posting and auto-tracks your application.
+
 **Trust Score Engine** — Every job posting gets a 0-100 trust score computed from 4 signals:
 - **Freshness** (25pts) — Newer postings score higher; stale/expired ones get flagged
 - **Crowdsourced Feedback** (35pts) — User-reported outcomes: hired, interviewed, ghosted, fake
@@ -16,7 +18,9 @@ JobScout AI helps you cut through fake, expired, or ghosted job postings by scor
 
 **Chrome Extension** — See trust scores directly on LinkedIn, Indeed, and Glassdoor job postings. Submit quick feedback without leaving the page.
 
-**Full-Stack Dashboard** — Job feed with search/filter/pagination, trust score breakdowns, crowdsourced signals visualization, application tracking, and outreach history.
+**Application Tracker** — Track every job you apply to. "Apply Now" opens the original posting and automatically logs the application with timestamp.
+
+**Full-Stack Dashboard** — Search-first experience: find jobs, see trust scores, read crowd signals, generate outreach, track applications — all in one place.
 
 ## Tech Stack
 
@@ -154,6 +158,7 @@ Confidence: high (10+ feedbacks), medium (3-9), low (<3)
 | GET | /outreach/templates | Yes | List saved messages |
 | POST | /job-applications | Yes | Track an application |
 | GET | /job-applications | Yes | List my applications |
+| POST | /job-search/scrape | Yes | Scrape real jobs from LinkedIn/Indeed/Glassdoor |
 
 ## Testing
 
