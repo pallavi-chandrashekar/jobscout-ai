@@ -10,15 +10,18 @@ interface Props {
 }
 
 interface TailorResult {
-  tailored_resume: string;
-  cover_letter: string;
+  tailored_resume: string | null;
+  cover_letter: string | null;
   provider: string;
   model: string;
   tokens_used: number;
 }
 
+type GenerateMode = "both" | "resume" | "cover";
+
 export default function ResumeTailor({ jobId, jobTitle, company }: Props) {
   const [resumeText, setResumeText] = useState("");
+  const [mode, setMode] = useState<GenerateMode>("both");
   const [result, setResult] = useState<TailorResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<"resume" | "cover">("resume");
@@ -42,14 +45,23 @@ export default function ResumeTailor({ jobId, jobTitle, company }: Props) {
       const res = await api.post<TailorResult>("/resume/tailor", {
         job_id: jobId,
         resume_text: resumeText,
+        include_resume: mode === "both" || mode === "resume",
+        include_cover_letter: mode === "both" || mode === "cover",
       });
       setResult(res.data);
-      setActiveTab("resume");
+      setActiveTab(res.data.tailored_resume ? "resume" : "cover");
     } catch (err) {
       console.error("Failed to tailor resume", err);
     } finally {
       setLoading(false);
     }
+  };
+
+  const buttonLabel = () => {
+    if (loading) return "AI is generating...";
+    if (mode === "resume") return "Tailor Resume Only";
+    if (mode === "cover") return "Generate Cover Letter Only";
+    return "Tailor Resume + Generate Cover Letter";
   };
 
   const handleCopy = (text: string) => {
@@ -81,6 +93,32 @@ export default function ResumeTailor({ jobId, jobTitle, company }: Props) {
 
       {!result ? (
         <>
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-700">
+              What do you want to generate?
+            </label>
+            <div className="grid grid-cols-3 gap-2">
+              {([
+                { value: "both", label: "Resume + Cover Letter" },
+                { value: "resume", label: "Resume Only" },
+                { value: "cover", label: "Cover Letter Only" },
+              ] as { value: GenerateMode; label: string }[]).map((opt) => (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => setMode(opt.value)}
+                  className={`rounded-lg border px-3 py-2 text-sm transition-colors ${
+                    mode === opt.value
+                      ? "border-blue-500 bg-blue-50 text-blue-700"
+                      : "border-gray-200 hover:bg-gray-50"
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
           <div>
             <label className="mb-2 block text-sm font-medium text-gray-700">
               Your base resume
@@ -115,69 +153,73 @@ export default function ResumeTailor({ jobId, jobTitle, company }: Props) {
             disabled={loading || !resumeText.trim()}
             className="w-full rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-3 text-sm font-medium text-white transition-all hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50"
           >
-            {loading ? "AI is tailoring your resume..." : "Tailor Resume + Generate Cover Letter"}
+            {buttonLabel()}
           </button>
         </>
       ) : (
         <>
-          {/* Tabs */}
-          <div className="flex gap-1 rounded-lg bg-gray-100 p-1">
-            <button
-              onClick={() => setActiveTab("resume")}
-              className={`flex-1 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
-                activeTab === "resume"
-                  ? "bg-white text-gray-900 shadow-sm"
-                  : "text-gray-500 hover:text-gray-700"
-              }`}
-            >
-              Tailored Resume
-            </button>
-            <button
-              onClick={() => setActiveTab("cover")}
-              className={`flex-1 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
-                activeTab === "cover"
-                  ? "bg-white text-gray-900 shadow-sm"
-                  : "text-gray-500 hover:text-gray-700"
-              }`}
-            >
-              Cover Letter
-            </button>
-          </div>
+          {/* Tabs — only show if both were generated */}
+          {result.tailored_resume && result.cover_letter && (
+            <div className="flex gap-1 rounded-lg bg-gray-100 p-1">
+              <button
+                onClick={() => setActiveTab("resume")}
+                className={`flex-1 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+                  activeTab === "resume"
+                    ? "bg-white text-gray-900 shadow-sm"
+                    : "text-gray-500 hover:text-gray-700"
+                }`}
+              >
+                Tailored Resume
+              </button>
+              <button
+                onClick={() => setActiveTab("cover")}
+                className={`flex-1 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+                  activeTab === "cover"
+                    ? "bg-white text-gray-900 shadow-sm"
+                    : "text-gray-500 hover:text-gray-700"
+                }`}
+              >
+                Cover Letter
+              </button>
+            </div>
+          )}
 
           {/* Content */}
-          <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
-            <div className="flex items-center justify-between text-xs text-gray-500">
-              <span>
-                Generated by {result.provider} ({result.model}) — {result.tokens_used} tokens
-              </span>
-              <div className="flex gap-2">
-                <button
-                  onClick={() =>
-                    handleCopy(activeTab === "resume" ? result.tailored_resume : result.cover_letter)
-                  }
-                  className="rounded bg-white px-2 py-1 text-xs font-medium text-blue-600 hover:bg-blue-50"
-                >
-                  {copied ? "Copied!" : "Copy"}
-                </button>
-                <button
-                  onClick={() =>
-                    handleDownload(
-                      activeTab === "resume" ? result.tailored_resume : result.cover_letter,
-                      activeTab === "resume"
-                        ? `resume_${company || "tailored"}.txt`
-                        : `cover_letter_${company || "tailored"}.txt`
-                    )
-                  }
-                  className="rounded bg-white px-2 py-1 text-xs font-medium text-green-600 hover:bg-green-50"
-                >
-                  Download
-                </button>
+          {(() => {
+            const showingResume = activeTab === "resume" && result.tailored_resume;
+            const content = showingResume ? result.tailored_resume : result.cover_letter;
+            const filename = showingResume
+              ? `resume_${company || "tailored"}.txt`
+              : `cover_letter_${company || "tailored"}.txt`;
+            const label = showingResume ? "Tailored Resume" : "Cover Letter";
+
+            if (!content) return null;
+
+            return (
+              <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
+                <div className="flex items-center justify-between text-xs text-gray-500">
+                  <span>
+                    {label} — {result.provider} ({result.model}) — {result.tokens_used} tokens
+                  </span>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleCopy(content)}
+                      className="rounded bg-white px-2 py-1 text-xs font-medium text-blue-600 hover:bg-blue-50"
+                    >
+                      {copied ? "Copied!" : "Copy"}
+                    </button>
+                    <button
+                      onClick={() => handleDownload(content, filename)}
+                      className="rounded bg-white px-2 py-1 text-xs font-medium text-green-600 hover:bg-green-50"
+                    >
+                      Download
+                    </button>
+                  </div>
+                </div>
+                <div className="mt-3 whitespace-pre-wrap text-sm text-gray-800">{content}</div>
               </div>
-            </div>
-            <div className="mt-3 whitespace-pre-wrap text-sm text-gray-800">
-              {activeTab === "resume" ? result.tailored_resume : result.cover_letter}
-            </div>
-          </div>
+            );
+          })()}
 
           <button
             onClick={() => setResult(null)}

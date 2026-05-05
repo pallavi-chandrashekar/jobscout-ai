@@ -13,11 +13,13 @@ router = APIRouter(prefix="/resume")
 class TailorRequest(BaseModel):
     job_id: UUID
     resume_text: str
+    include_resume: bool = True
+    include_cover_letter: bool = True
 
 
 class TailorResponse(BaseModel):
-    tailored_resume: str
-    cover_letter: str
+    tailored_resume: str | None = None
+    cover_letter: str | None = None
     provider: str
     model: str
     tokens_used: int
@@ -36,9 +38,14 @@ async def tailor_resume_for_job(
     if not request.resume_text.strip():
         raise HTTPException(status_code=400, detail="Resume text cannot be empty")
 
+    if not request.include_resume and not request.include_cover_letter:
+        raise HTTPException(status_code=400, detail="Must include at least resume or cover letter")
+
     result = await tailor_resume(
         resume_text=request.resume_text,
         job=job,
+        include_resume=request.include_resume,
+        include_cover_letter=request.include_cover_letter,
     )
 
     return TailorResponse(**result)

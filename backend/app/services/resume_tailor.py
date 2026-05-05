@@ -30,14 +30,21 @@ Given a candidate's resume and a job description, write a cover letter that:
 async def tailor_resume(
     resume_text: str,
     job: JobPosting,
+    include_resume: bool = True,
+    include_cover_letter: bool = True,
 ) -> dict:
-    """Tailor a resume for a specific job posting. Returns tailored resume + cover letter."""
-    client = create_llm_client()
+    """Tailor a resume and/or cover letter for a specific job posting."""
+    if not include_resume and not include_cover_letter:
+        raise ValueError("Must include at least resume or cover letter")
 
+    client = create_llm_client()
     job_info = _build_job_context(job)
 
-    # Generate tailored resume
-    resume_message = f"""Here is my base resume:
+    tailored_resume = None
+    cover_letter = None
+
+    if include_resume:
+        resume_message = f"""Here is my base resume:
 
 ---
 {resume_text}
@@ -50,11 +57,10 @@ Here is the job I'm applying to:
 ---
 
 Rewrite my resume tailored for this specific job. Output the full resume in clean plain text."""
+        tailored_resume = await client.text_message(TAILOR_SYSTEM_PROMPT, resume_message)
 
-    tailored_resume = await client.text_message(TAILOR_SYSTEM_PROMPT, resume_message)
-
-    # Generate cover letter
-    cover_message = f"""Here is my resume:
+    if include_cover_letter:
+        cover_message = f"""Here is my resume:
 
 ---
 {resume_text}
@@ -67,8 +73,7 @@ Here is the job I'm applying to:
 ---
 
 Write a personalized cover letter for this job."""
-
-    cover_letter = await client.text_message(COVER_LETTER_SYSTEM_PROMPT, cover_message)
+        cover_letter = await client.text_message(COVER_LETTER_SYSTEM_PROMPT, cover_message)
 
     usage = client.get_token_usage()
 
