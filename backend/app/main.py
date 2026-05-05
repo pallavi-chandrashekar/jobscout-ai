@@ -10,6 +10,7 @@ from app.api.job_feedbacks import router as job_feedback_router
 from app.api.outreach_templates import router as outreach_router
 from app.api.trust_score import router as trust_score_router
 from app.api.job_search import router as job_search_router
+from app.api.resume import router as resume_router
 
 settings = get_settings()
 
@@ -35,6 +36,7 @@ app.include_router(job_feedback_router, tags=["Job Feedbacks"])
 app.include_router(outreach_router, tags=["Outreach"])
 app.include_router(trust_score_router, tags=["Trust Score"])
 app.include_router(job_search_router, tags=["Job Search"])
+app.include_router(resume_router, tags=["Resume"])
 
 
 @app.get("/health")

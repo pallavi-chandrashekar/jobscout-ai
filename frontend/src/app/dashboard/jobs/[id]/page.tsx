@@ -9,6 +9,7 @@ import TrustScoreBreakdown from "@/components/jobs/TrustScoreBreakdown";
 import FeedbackForm from "@/components/jobs/FeedbackForm";
 import CrowdSignals from "@/components/signals/CrowdSignals";
 import OutreachGenerator from "@/components/outreach/OutreachGenerator";
+import ResumeTailor from "@/components/jobs/ResumeTailor";
 
 export default function JobDetailPage() {
   const params = useParams();
@@ -106,6 +107,9 @@ export default function JobDetailPage() {
 
       {/* Feedback Form */}
       <FeedbackForm jobId={jobId} onSubmitted={fetchData} />
+
+      {/* Resume Tailor */}
+      <ResumeTailor jobId={jobId} jobTitle={job.title || undefined} company={job.company || undefined} />
 
       {/* Outreach Generator */}
       <OutreachGenerator jobId={jobId} jobTitle={job.title || undefined} />
