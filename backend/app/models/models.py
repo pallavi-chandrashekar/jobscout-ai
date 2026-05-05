@@ -50,6 +50,8 @@ class JobApplication(Base):
     job_id = Column(UUID(as_uuid=True), ForeignKey("job_postings.id"))
     status = Column(String, default="applied")
     applied_date = Column(DateTime, default=datetime.utcnow)
+    tailored_resume = Column(Text, nullable=True)
+    cover_letter = Column(Text, nullable=True)
 
     user = relationship("User", back_populates="applications")
     job = relationship("JobPosting", back_populates="applications")

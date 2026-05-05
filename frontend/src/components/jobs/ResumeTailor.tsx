@@ -7,6 +7,7 @@ interface Props {
   jobId: string;
   jobTitle?: string;
   company?: string;
+  onGenerated?: (resume: string | null, coverLetter: string | null) => void;
 }
 
 interface TailorResult {
@@ -19,7 +20,7 @@ interface TailorResult {
 
 type GenerateMode = "both" | "resume" | "cover";
 
-export default function ResumeTailor({ jobId, jobTitle, company }: Props) {
+export default function ResumeTailor({ jobId, jobTitle, company, onGenerated }: Props) {
   const [resumeText, setResumeText] = useState("");
   const [mode, setMode] = useState<GenerateMode>("both");
   const [result, setResult] = useState<TailorResult | null>(null);
@@ -50,6 +51,7 @@ export default function ResumeTailor({ jobId, jobTitle, company }: Props) {
       });
       setResult(res.data);
       setActiveTab(res.data.tailored_resume ? "resume" : "cover");
+      onGenerated?.(res.data.tailored_resume, res.data.cover_letter);
     } catch (err) {
       console.error("Failed to tailor resume", err);
     } finally {
@@ -222,7 +224,7 @@ export default function ResumeTailor({ jobId, jobTitle, company }: Props) {
           })()}
 
           <button
-            onClick={() => setResult(null)}
+            onClick={() => { setResult(null); onGenerated?.(null, null); }}
             className="w-full rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50"
           >
             Start Over

@@ -146,16 +146,22 @@ class JobApplicationBase(BaseModel):
 
 class JobApplicationCreate(JobApplicationBase):
     job_id: UUID
+    tailored_resume: Optional[str] = None
+    cover_letter: Optional[str] = None
 
 
 class JobApplicationUpdate(BaseModel):
     status: Optional[str] = None
+    tailored_resume: Optional[str] = None
+    cover_letter: Optional[str] = None
 
 
 class JobApplicationRead(JobApplicationBase):
     id: UUID
     user_id: UUID
     job_id: UUID
+    tailored_resume: Optional[str] = None
+    cover_letter: Optional[str] = None
 
     class Config:
         from_attributes = True

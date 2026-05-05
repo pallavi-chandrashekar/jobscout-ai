@@ -20,6 +20,8 @@ def create_application(
         job_id=application.job_id,
         status=application.status or "applied",
         applied_date=application.applied_date,
+        tailored_resume=application.tailored_resume,
+        cover_letter=application.cover_letter,
     )
     db.add(job_app)
     db.commit()

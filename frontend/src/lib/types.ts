@@ -40,6 +40,8 @@ export interface JobApplication {
   job_id: string;
   status: string;
   applied_date: string | null;
+  tailored_resume: string | null;
+  cover_letter: string | null;
 }
 
 export interface JobFeedback {

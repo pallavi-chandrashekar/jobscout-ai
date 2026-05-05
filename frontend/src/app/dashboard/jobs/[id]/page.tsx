@@ -19,6 +19,9 @@ export default function JobDetailPage() {
   const [trustDetail, setTrustDetail] = useState<TrustScoreDetail | null>(null);
   const [feedbackAgg, setFeedbackAgg] = useState<FeedbackAggregation | null>(null);
   const [loading, setLoading] = useState(true);
+  const [tailoredResume, setTailoredResume] = useState<string | null>(null);
+  const [coverLetter, setCoverLetter] = useState<string | null>(null);
+  const [applyStatus, setApplyStatus] = useState<string>("");
 
   const fetchData = useCallback(async () => {
     try {
@@ -75,26 +78,47 @@ export default function JobDetailPage() {
           </div>
         )}
         {job.url && (
-          <div className="mt-4 flex gap-3">
-            <button
-              onClick={async () => {
-                try {
-                  await api.post("/job-applications", { job_id: job.id });
-                } catch {}
-                window.open(job.url, "_blank");
-              }}
-              className="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700"
-            >
-              Apply Now
-            </button>
-            <a
-              href={job.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="rounded-lg border border-gray-200 px-5 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
-            >
-              View Original
-            </a>
+          <div className="mt-4">
+            <div className="flex gap-3">
+              <button
+                onClick={async () => {
+                  try {
+                    await api.post("/job-applications", {
+                      job_id: job.id,
+                      tailored_resume: tailoredResume,
+                      cover_letter: coverLetter,
+                    });
+                    if (tailoredResume || coverLetter) {
+                      setApplyStatus("Applied — your tailored resume was saved with this application.");
+                    } else {
+                      setApplyStatus("Applied — no resume attached. Tailor a resume below first if you want it saved.");
+                    }
+                  } catch {
+                    setApplyStatus("Failed to track application");
+                  }
+                  window.open(job.url, "_blank");
+                }}
+                className="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+              >
+                Apply Now
+              </button>
+              <a
+                href={job.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-lg border border-gray-200 px-5 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+              >
+                View Original
+              </a>
+              {(tailoredResume || coverLetter) && (
+                <span className="flex items-center text-xs text-green-700">
+                  ✓ Tailored {tailoredResume && "resume"}{tailoredResume && coverLetter && " + "}{coverLetter && "cover letter"} ready
+                </span>
+              )}
+            </div>
+            {applyStatus && (
+              <p className="mt-2 text-xs text-gray-600">{applyStatus}</p>
+            )}
           </div>
         )}
       </div>
@@ -109,7 +133,16 @@ export default function JobDetailPage() {
       <FeedbackForm jobId={jobId} onSubmitted={fetchData} />
 
       {/* Resume Tailor */}
-      <ResumeTailor jobId={jobId} jobTitle={job.title || undefined} company={job.company || undefined} />
+      <ResumeTailor
+        jobId={jobId}
+        jobTitle={job.title || undefined}
+        company={job.company || undefined}
+        onGenerated={(resume, cover) => {
+          setTailoredResume(resume);
+          setCoverLetter(cover);
+          setApplyStatus("");
+        }}
+      />
 
       {/* Outreach Generator */}
       <OutreachGenerator jobId={jobId} jobTitle={job.title || undefined} />
